@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>luthfft.my.id — Homelab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --accent: #00ff9d;
+      --accent2: #0099ff;
+      --bg: #080c10;
+      --card: #0d1117;
+      --border: #1e2a36;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      font-family: 'Syne', sans-serif;
+      color: #e0eaf5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Glow orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .mono { font-family: 'Space Mono', monospace; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,255,157,0.04), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      border-color: rgba(0,255,157,0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0,255,157,0.05);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.offline {
+      background: #ff4d6d;
+      box-shadow: 0 0 8px #ff4d6d;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      border: 1px solid;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-green {
+      color: var(--accent);
+      border-color: rgba(0,255,157,0.3);
+      background: rgba(0,255,157,0.05);
+    }
+
+    .tag-blue {
+      color: var(--accent2);
+      border-color: rgba(0,153,255,0.3);
+      background: rgba(0,153,255,0.05);
+    }
+
+    .tag-purple {
+      color: #c77dff;
+      border-color: rgba(199,125,255,0.3);
+      background: rgba(199,125,255,0.05);
+    }
+
+    .accent-line {
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    /* Link hover arrow animation */
+    .arrow-icon {
+      transition: transform 0.2s ease;
+    }
+    .card:hover .arrow-icon {
+      transform: translate(3px, -3px);
+    }
+
+    /* Fade in animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+
+    /* Scanline effect on header */
+    .scanline {
+      position: relative;
+    }
+    .scanline::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.05) 2px,
+        rgba(0,0,0,0.05) 4px
+      );
+      pointer-events: none;
+    }
+
+    a { text-decoration: none; color: inherit; }
+  </style>
+</head>
+<body>
+
+  <!-- Glow orbs -->
+  <div class="orb" style="width:500px;height:500px;background:#00ff9d;top:-200px;left:-100px;"></div>
+  <div class="orb" style="width:400px;height:400px;background:#0099ff;bottom:-150px;right:-100px;"></div>
+
+  <div class="relative z-10 max-w-3xl mx-auto px-6 py-16">
+
+    <!-- Header -->
+    <div class="fade-up mb-14">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="status-dot"></div>
+        <span class="mono text-xs" style="color: var(--accent)">SYSTEM ONLINE</span>
+      </div>
+
+      <h1 class="text-5xl font-extrabold tracking-tight mb-2" style="line-height:1.1">
+        luthfft<span style="color:var(--accent)">.my.id</span>
+      </h1>
+      <p class="mono text-sm" style="color:#4a6278">personal homelab — hp thin client t610 • ubuntu 24.04</p>
+      <div class="accent-line mt-6" style="width:80px"></div>
+    </div>
+
+    <!-- Services label -->
+    <div class="fade-up delay-1 mb-5 flex items-center gap-3">
+      <span class="mono text-xs tracking-widest" style="color:#4a6278">// SERVICES</span>
+      <div style="height:1px;flex:1;background:var(--border)"></div>
+      <span class="mono text-xs" style="color:#4a6278">2 running</span>
+    </div>
+
+    <!-- Cards -->
+    <div class="space-y-4">
+
+      <!-- CasaOS -->
+      <a href="https://casa.luthfft.my.id" target="_blank" class="fade-up delay-2 card rounded-xl p-6 flex items-center justify-between block">
+        <div class="flex items-center gap-5">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style="background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.15)">
+            🏠
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h2 class="text-lg font-bold">CasaOS</h2>
+              <div class="status-dot" style="width:6px;height:6px"></div>
+            </div>
+            <p class="mono text-xs mb-2" style="color:#4a6278">casa.luthfft.my.id</p>
+            <div class="flex gap-2">
+              <span class="tag tag-green">DASHBOARD</span>
+              <span class="tag tag-green">:80</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+          <svg class="arrow-icon w-5 h-5" style="color:#4a6278" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+          <span class="tag tag-green">LIVE</span>
+        </div>
+      </a>
+
+      <!-- Portfolio -->
+      <a href="https://portoluthf.netlify.app/" target="_blank" class="fade-up delay-3 card rounded-xl p-6 flex items-center justify-between block">
+        <div class="flex items-center gap-5">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl" style="background:rgba(0,153,255,0.08);border:1px solid rgba(0,153,255,0.15)">
+            👤
+          </div>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h2 class="text-lg font-bold">Portfolio</h2>
+              <div class="status-dot" style="width:6px;height:6px"></div>
+            </div>
+            <p class="mono text-xs mb-2" style="color:#4a6278">portoluthf.netlify.app</p>
+            <div class="flex gap-2">
+              <span class="tag tag-blue">PORTFOLIO</span>
+              <span class="tag tag-blue">NETLIFY</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-2">
+          <svg class="arrow-icon w-5 h-5" style="color:#4a6278" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+          <span class="tag tag-blue">LIVE</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="fade-up delay-4 mt-14 flex items-center justify-between">
+      <div>
+        <div class="accent-line mb-3" style="width:40px"></div>
+        <p class="mono text-xs" style="color:#2a3a4a">powered by cloudflare tunnel</p>
+      </div>
+      <div class="mono text-xs text-right" style="color:#2a3a4a">
+        <div id="clock"></div>
+        <div>WIB (UTC+7)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const wib = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+      const h = String(wib.getUTCHours()).padStart(2,'0');
+      const m = String(wib.getUTCMinutes()).padStart(2,'0');
+      const s = String(wib.getUTCSeconds()).padStart(2,'0');
+      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+
+</body>
+</html>
